@@ -1,5 +1,3 @@
 {
-    "conventionalCommits.scopes": [
-        "Global"
-    ]
+  "conventionalCommits.scopes": ["Global", "database", "linter"]
 }
