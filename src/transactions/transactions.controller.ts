@@ -15,17 +15,19 @@ export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Get()
-  getUsers() {
+  getUsers(): Promise<Transaction[]> {
     return this.transactionsService.getAllTransactions();
   }
 
   @Get(':transactionId')
-  getUser(@Param('transactionId') transactionId: number) {
+  getUser(
+    @Param('transactionId') transactionId: number,
+  ): Promise<Transaction | null> {
     return this.transactionsService.getTransactionById(transactionId);
   }
 
   @Post()
-  createUser(@Body() transaction: Transaction) {
+  createUser(@Body() transaction: Transaction): Promise<Transaction> {
     return this.transactionsService.createTransaction(transaction);
   }
 
@@ -33,7 +35,7 @@ export class TransactionsController {
   updateUser(
     @Param('transactionId') transactionId: number,
     @Body() transactionDataToUpdate: Transaction,
-  ) {
+  ): Promise<Transaction> {
     return this.transactionsService.updateTransaction(
       transactionId,
       transactionDataToUpdate,
@@ -41,7 +43,7 @@ export class TransactionsController {
   }
 
   @Delete(':transactionId')
-  deleteUser(@Param('transactionId') transactionId: number) {
+  deleteUser(@Param('transactionId') transactionId: number): Promise<null> {
     return this.transactionsService.deleteTransactionById(transactionId);
   }
 }
