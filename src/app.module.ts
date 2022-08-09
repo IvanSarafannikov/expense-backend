@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
+import { TransactionsModule } from './transactions/transactions.module';
+import { Transaction } from './transactions/transaction.entity';
 import { CategoriesModule } from './categories/categories.module';
 import { Category } from './categories/category.entity';
 
@@ -14,7 +16,7 @@ import { Category } from './categories/category.entity';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env?.['DATABASE_URL'],
-      entities: [User, Category],
+      entities: [User, Category, Transaction],
       synchronize: true,
       ssl: true,
       extra: {
@@ -23,6 +25,7 @@ import { Category } from './categories/category.entity';
     }),
     UsersModule,
     CategoriesModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
