@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/category.entity';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { CategoriesModule } from './categories/categories.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env?.['DATABASE_URL'],
-      entities: [User],
+      entities: [User, Category],
       synchronize: true,
       ssl: true,
       extra: {
