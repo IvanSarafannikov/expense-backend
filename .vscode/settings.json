@@ -1,0 +1,9 @@
+{
+  "conventionalCommits.scopes": [
+    "Global",
+    "database",
+    "linter",
+    "module",
+    "git"
+  ]
+}
