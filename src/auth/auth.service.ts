@@ -112,18 +112,16 @@ export class AuthService {
     return null;
   }
 
-  //   private validateAccessToken(accessToken: string): accessTokenPayload | null {
-  //     try {
-  //       const payload = this.jwtService.verify(accessToken, accessTokenOptions);
-  //       return payload;
-  //     } catch (e) {
-  //       return null;
-  //     }
-  //   }
+  validateAccessToken(accessToken: string): accessTokenPayload | null {
+    try {
+      const payload = this.jwtService.verify(accessToken, accessTokenOptions);
+      return payload;
+    } catch (e) {
+      return null;
+    }
+  }
 
-  private validateRefreshToken(
-    refreshToken: string,
-  ): accessTokenPayload | null {
+  validateRefreshToken(refreshToken: string): accessTokenPayload | null {
     try {
       const payload = this.jwtService.verify(refreshToken, refreshTokenOptions);
       return payload;

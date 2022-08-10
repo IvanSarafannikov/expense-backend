@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 import type { User } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -14,6 +16,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   getUsers() {
     return this.usersService.getAllUsers();
