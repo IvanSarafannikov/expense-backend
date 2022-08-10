@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
@@ -32,9 +32,8 @@ export class TransactionsService {
     });
 
     if (!transaction) {
-      throw new HttpException(
+      throw new BadRequestException(
         'Transaction you want to update does not exists',
-        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -48,10 +47,7 @@ export class TransactionsService {
     const result = await this.transactionsRepository.delete({ id });
 
     if (!result.affected) {
-      throw new HttpException(
-        'User you want to delete does not exists',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('User you want to delete does not exists');
     }
 
     return null;
