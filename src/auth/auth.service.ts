@@ -12,6 +12,7 @@ import {
   refreshTokenOptions,
   refreshTokenPayload,
 } from './tokens.settings';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -40,13 +41,11 @@ export class AuthService {
     const accessToken = this.generateAccessToken(user);
     const refreshToken = this.generateRefreshToken(user);
 
-    const userWithRefreshToken = await this.usersService.updateUser(user.id, {
-      ...user,
-      refreshToken,
-    });
+    user.refreshToken = refreshToken;
+    await this.usersService.updateUserRefreshToken(user.id, refreshToken);
 
     return {
-      user: userWithRefreshToken,
+      user,
       tokens: { accessToken, refreshToken },
     };
   }
@@ -57,9 +56,16 @@ export class AuthService {
   }> {
     // TODO: dto for validation
     const user = await this.usersService.getUserByUsername(candidate.username);
+    if (!user) {
+      throw new UnauthorizedException('wrong username or password');
+    }
 
-    // TODO: compare hashed passwords
-    if (!user || user.password !== candidate.password) {
+    const passwordsMatch = await bcrypt.compare(
+      candidate.password,
+      user.password,
+    );
+
+    if (!passwordsMatch) {
       throw new UnauthorizedException('wrong username or password');
     }
 
