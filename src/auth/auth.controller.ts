@@ -35,11 +35,11 @@ export class AuthController {
   }
 
   @Get('refresh')
-  async refresh(@Req() request: Request): Promise<{ refreshToken: string }> {
-    const refreshToken = await this.auhtService.refresh(
+  async refresh(@Req() request: Request): Promise<{ accessToken: string }> {
+    const accessToken = await this.auhtService.refresh(
       request.cookies['refreshToken'],
     );
-    return { refreshToken };
+    return { accessToken };
   }
 
   @Post('logout')
