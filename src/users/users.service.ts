@@ -21,6 +21,10 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { username } });
   }
 
+  async getUserByRefreshToken(refreshToken: string) {
+    return this.usersRepository.findOne({ where: { refreshToken } });
+  }
+
   async createUser(userData: User) {
     // TODO: implement create-user dto on which create user for better control
     // TODO: create related entities
@@ -42,6 +46,11 @@ export class UsersService {
     }
 
     return this.usersRepository.save({ ...user, ...userDataToUpdate });
+  }
+
+  async deleteUserRefreshToken(id: number): Promise<null> {
+    await this.usersRepository.update({ id }, { refreshToken: '' });
+    return null;
   }
 
   async deleteUserById(id: number) {
