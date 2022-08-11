@@ -8,14 +8,14 @@ import { AuthUser } from './decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auhtService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   register(@Body() userDto: User): Promise<{
     user: User;
     tokens: { accessToken: string; refreshToken: string };
   }> {
-    return this.auhtService.register(userDto);
+    return this.authService.register(userDto);
   }
 
   @Post('login')
@@ -26,7 +26,7 @@ export class AuthController {
     user: User;
     tokens: { accessToken: string; refreshToken: string };
   }> {
-    const responseData = await this.auhtService.login(candidate);
+    const responseData = await this.authService.login(candidate);
 
     response.cookie(
       'refreshToken',
@@ -39,7 +39,7 @@ export class AuthController {
   @Get('refresh')
   @UseGuards(RefreshAuthGuard)
   refresh(@AuthUser() user: User): { accessToken: string } {
-    const accessToken = this.auhtService.generateAccessToken(user);
+    const accessToken = this.authService.generateAccessToken(user);
     return { accessToken };
   }
 
@@ -49,7 +49,7 @@ export class AuthController {
     @AuthUser() user: User,
     @Res({ passthrough: true }) response: Response,
   ): Promise<null> {
-    await this.auhtService.logout(user);
+    await this.authService.logout(user);
 
     response.clearCookie('refreshToken', refreshTokenCookieOptios);
 
