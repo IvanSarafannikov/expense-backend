@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -35,10 +35,7 @@ export class UsersService {
     const user = await this.usersRepository.findOne({ where: { id } });
 
     if (!user) {
-      throw new HttpException(
-        'User you want to update does not exists',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('User you want to update does not exists');
     }
 
     return this.usersRepository.save({ ...user, ...userDataToUpdate });
@@ -49,10 +46,7 @@ export class UsersService {
     const result = await this.usersRepository.delete({ id });
 
     if (!result.affected) {
-      throw new HttpException(
-        'User you want to delete does not exists',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('User you want to delete does not exists');
     }
 
     return null;
