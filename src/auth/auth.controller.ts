@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
 import type { User } from 'src/users/user.entity';
 import { AuthService } from './auth.service';
+import { RefreshAuthGuard } from './guards/refresh-auth.guard';
 import { refreshTokenCookieOptios } from './tokens.settings';
+import { AuthUser } from './decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -35,19 +37,19 @@ export class AuthController {
   }
 
   @Get('refresh')
-  async refresh(@Req() request: Request): Promise<{ accessToken: string }> {
-    const accessToken = await this.auhtService.refresh(
-      request.cookies['refreshToken'],
-    );
+  @UseGuards(RefreshAuthGuard)
+  refresh(@AuthUser() user: User): { accessToken: string } {
+    const accessToken = this.auhtService.generateAccessToken(user);
     return { accessToken };
   }
 
   @Post('logout')
+  @UseGuards(RefreshAuthGuard)
   async logout(
-    @Req() request: Request,
+    @AuthUser() user: User,
     @Res({ passthrough: true }) response: Response,
   ): Promise<null> {
-    await this.auhtService.logout(request.cookies['refreshToken']);
+    await this.auhtService.logout(user);
 
     response.clearCookie('refreshToken', refreshTokenCookieOptios);
 

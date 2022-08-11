@@ -8,9 +8,9 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { User, UserRoles } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -19,7 +19,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AccessAuthGuard, RolesGuard)
   @Roles(UserRoles.ADMIN)
   getUsers() {
     return this.usersService.getAllUsers();

@@ -95,19 +95,8 @@ export class AuthService {
     return accessToken;
   }
 
-  async logout(refreshToken: string): Promise<null> {
-    if (!refreshToken) {
-      throw new UnauthorizedException('You are not logged in');
-    }
-    const payload = this.validateRefreshToken(refreshToken);
-
-    if (!payload) {
-      throw new UnauthorizedException(
-        'Your refresh token is invalid or has expired',
-      );
-    }
-
-    await this.usersService.deleteUserRefreshToken(payload.id);
+  async logout(user: User): Promise<null> {
+    await this.usersService.deleteUserRefreshToken(user.id);
 
     return null;
   }
@@ -121,7 +110,7 @@ export class AuthService {
     }
   }
 
-  validateRefreshToken(refreshToken: string): accessTokenPayload | null {
+  validateRefreshToken(refreshToken: string): refreshTokenPayload | null {
     try {
       const payload = this.jwtService.verify(refreshToken, refreshTokenOptions);
       return payload;
@@ -130,7 +119,7 @@ export class AuthService {
     }
   }
 
-  private generateAccessToken(user: User): string {
+  generateAccessToken(user: User): string {
     const payload: accessTokenPayload = {
       id: user.id,
       username: user.username,
@@ -140,7 +129,7 @@ export class AuthService {
     return this.jwtService.sign(payload, accessTokenOptions);
   }
 
-  private generateRefreshToken(user: User): string {
+  generateRefreshToken(user: User): string {
     const payload: refreshTokenPayload = {
       id: user.id,
       username: user.username,
