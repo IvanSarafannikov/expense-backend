@@ -9,19 +9,19 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async getAllUsers() {
+  async getAllUsers(): Promise<User[]> {
     return this.usersRepository.find();
   }
 
-  async getUserById(id: number) {
+  async getUserById(id: number): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
 
-  async getUserByUsername(username: string) {
+  async getUserByUsername(username: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { username } });
   }
 
-  async createUser(userData: User) {
+  async createUser(userData: User): Promise<User> {
     // TODO: implement create-user dto on which create user for better control
     // TODO: create related entities
     const user = this.usersRepository.create(userData);
@@ -29,7 +29,7 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(id: number, userDataToUpdate: User) {
+  async updateUser(id: number, userDataToUpdate: User): Promise<User> {
     // TODO: create update-user dto and update entity with it to prevent updating unwanted fields and validation
 
     const user = await this.usersRepository.findOne({ where: { id } });
@@ -44,7 +44,7 @@ export class UsersService {
     return this.usersRepository.save({ ...user, ...userDataToUpdate });
   }
 
-  async deleteUserById(id: number) {
+  async deleteUserById(id: number): Promise<null> {
     // TODO: delete related entities
     const result = await this.usersRepository.delete({ id });
 

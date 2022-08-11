@@ -10,21 +10,24 @@ export class TransactionsService {
     private transactionsRepository: Repository<Transaction>,
   ) {}
 
-  async getAllTransactions() {
+  async getAllTransactions(): Promise<Transaction[]> {
     return this.transactionsRepository.find();
   }
 
-  async getTransactionById(id: number) {
+  async getTransactionById(id: number): Promise<Transaction | null> {
     return this.transactionsRepository.findOne({ where: { id } });
   }
 
-  async createTransaction(transactionData: Transaction) {
+  async createTransaction(transactionData: Transaction): Promise<Transaction> {
     // TODO: implement create-transaction dto on which create transaction for validation
     const transaction = this.transactionsRepository.create(transactionData);
     return this.transactionsRepository.save(transaction);
   }
 
-  async updateTransaction(id: number, transactionDataToUpdate: Transaction) {
+  async updateTransaction(
+    id: number,
+    transactionDataToUpdate: Transaction,
+  ): Promise<Transaction> {
     // TODO: create update-transaction dto and update entity with it to prevent updating unwanted fields and validation
 
     const transaction = await this.transactionsRepository.findOne({
@@ -44,7 +47,7 @@ export class TransactionsService {
     });
   }
 
-  async deleteTransactionById(id: number) {
+  async deleteTransactionById(id: number): Promise<null> {
     const result = await this.transactionsRepository.delete({ id });
 
     if (!result.affected) {
