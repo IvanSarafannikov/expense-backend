@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from 'src/categories/category.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRoles {
   ADMIN = 'Administrator',
@@ -28,4 +29,9 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken!: string;
+
+  @OneToMany(() => Category, (category) => category.user, {
+    cascade: true,
+  })
+  categories!: Category[];
 }

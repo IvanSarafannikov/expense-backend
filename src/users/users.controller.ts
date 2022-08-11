@@ -21,7 +21,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(AccessAuthGuard, RolesGuard)
-  @Roles(UserRoles.ADMIN)
+  @Roles(UserRoles.USER)
   getUsers(): Promise<User[]> {
     return this.usersService.getAllUsers();
   }

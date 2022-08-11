@@ -1,7 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import type { User } from 'src/users/user.entity';
 import type { Repository } from 'typeorm';
 import { Category } from './category.entity';
+import { defaultCategories } from './default.categories';
 
 @Injectable()
 export class CategoriesService {
@@ -15,13 +17,31 @@ export class CategoriesService {
   }
 
   async getCategoryById(id: number): Promise<Category | null> {
-    return this.categoriesRepository.findOne({ where: { id } });
+    return this.categoriesRepository.findOne({
+      where: { id },
+      relations: { transactions: true, user: true },
+    });
+  }
+
+  async getUserOtherCategory(user: User): Promise<Category | null> {
+    return this.categoriesRepository.findOne({
+      where: { user, label: 'Other' },
+      relations: { transactions: true },
+    });
   }
 
   async createCategory(categoryData: Category): Promise<Category> {
     // TODO: create-category dto to create entity with validation
     const category = this.categoriesRepository.create(categoryData);
     return this.categoriesRepository.save(category);
+  }
+
+  async createDefaultCategories(user: User): Promise<Category[]> {
+    const categories = this.categoriesRepository.create(
+      defaultCategories.map((category) => ({ label: category, user })),
+    );
+
+    return this.categoriesRepository.save(categories);
   }
 
   async updateCategory(
@@ -36,6 +56,12 @@ export class CategoriesService {
       throw new BadRequestException('User you want to update does not exists');
     }
 
+    if (category.label === 'Other') {
+      throw new BadRequestException(
+        'You are not allowed to rename this category',
+      );
+    }
+
     return this.categoriesRepository.save({
       ...category,
       ...categoryDataToUpdate,
@@ -43,7 +69,34 @@ export class CategoriesService {
   }
 
   async deleteCategoryById(id: number): Promise<null> {
-    // TODO: delete related entities
+    const category = await this.getCategoryById(id);
+
+    if (!category) {
+      throw new BadRequestException(
+        'Category you want to delete does not exists',
+      );
+    }
+
+    if (category?.label === 'Other') {
+      throw new BadRequestException(
+        `You are not allowed to delete this category`,
+      );
+    }
+
+    const otherCategory = await this.getUserOtherCategory(category.user);
+
+    if (otherCategory) {
+      if (otherCategory?.transactions) {
+        otherCategory.transactions = [
+          ...otherCategory?.transactions,
+          ...category.transactions,
+        ];
+      } else {
+        otherCategory.transactions = category.transactions;
+      }
+      await this.categoriesRepository.save(otherCategory);
+    }
+
     const result = await this.categoriesRepository.delete({ id });
 
     if (!result.affected) {

@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Transaction } from 'src/transactions/transaction.entity';
+import { User } from 'src/users/user.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 @Entity({ name: 'categories' })
 export class Category {
   @PrimaryGeneratedColumn()
@@ -6,4 +14,10 @@ export class Category {
 
   @Column({ unique: true })
   label!: string;
+
+  @ManyToOne(() => User, (user) => user.categories, { onDelete: 'CASCADE' })
+  user!: User;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.category)
+  transactions!: Transaction[];
 }
