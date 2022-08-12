@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { User } from 'src/users/user.entity';
 import type { Repository } from 'typeorm';
@@ -54,9 +58,17 @@ export class CategoriesService {
     });
   }
 
-  //TODO: Prevent creating categories with equal labels for same user (read about db composite key?)
   async createCategory(user: User, categoryData: Category): Promise<Category> {
     // TODO: create-category dto to create entity with validation
+    const existingCategory = await this.getUserCategoryByLabel(
+      user,
+      categoryData.label,
+    );
+
+    if (existingCategory) {
+      throw new ConflictException('Category with this label already exists');
+    }
+
     const category = this.categoriesRepository.create(categoryData);
     category.user = user;
     return this.categoriesRepository.save(category);
