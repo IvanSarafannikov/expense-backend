@@ -1,4 +1,5 @@
 import { Category } from 'src/categories/category.entity';
+import { Transaction } from 'src/transactions/transaction.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRoles {
@@ -34,4 +35,7 @@ export class User {
     cascade: true,
   })
   categories!: Category[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.user)
+  transactions!: Transaction[];
 }
