@@ -12,7 +12,7 @@ export class Category {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ unique: true })
+  @Column()
   label!: string;
 
   @ManyToOne(() => User, (user) => user.categories, { onDelete: 'CASCADE' })

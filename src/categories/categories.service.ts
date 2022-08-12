@@ -54,6 +54,7 @@ export class CategoriesService {
     });
   }
 
+  //TODO: Prevent creating categories with equal labels for same user (read about db composite key?)
   async createCategory(user: User, categoryData: Category): Promise<Category> {
     // TODO: create-category dto to create entity with validation
     const category = this.categoriesRepository.create(categoryData);
