@@ -23,6 +23,23 @@ export class CategoriesService {
     });
   }
 
+  async getUserCategories(user: User): Promise<Category[]> {
+    return this.categoriesRepository.find({
+      where: { user },
+      relations: { transactions: true },
+    });
+  }
+
+  async getUserCategoryByLabel(
+    user: User,
+    label: string,
+  ): Promise<Category | null> {
+    return this.categoriesRepository.findOne({
+      where: { user, label },
+      relations: { transactions: true },
+    });
+  }
+
   async getUserOtherCategory(user: User): Promise<Category | null> {
     return this.categoriesRepository.findOne({
       where: { user, label: 'Other' },

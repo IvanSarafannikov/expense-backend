@@ -6,7 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthUser } from 'src/auth/decorators/user.decorator';
+import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
+import type { User } from 'src/users/user.entity';
 import type { Transaction } from './transaction.entity';
 import { TransactionsService } from './transactions.service';
 
@@ -27,8 +31,16 @@ export class TransactionsController {
   }
 
   @Post()
-  createUser(@Body() transaction: Transaction): Promise<Transaction> {
-    return this.transactionsService.createTransaction(transaction);
+  @UseGuards(AccessAuthGuard)
+  createUser(
+    @AuthUser() user: User,
+    @Body()
+    transactionData: {
+      transaction: Transaction;
+      categoryLabel: string;
+    },
+  ): Promise<Transaction> {
+    return this.transactionsService.createTransaction(user, transactionData);
   }
 
   @Patch(':transactionId')

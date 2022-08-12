@@ -1,5 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CategoriesService } from 'src/categories/categories.service';
+import type { User } from 'src/users/user.entity';
 import type { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 
@@ -8,6 +15,8 @@ export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
+    @Inject(forwardRef(() => CategoriesService))
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async getAllTransactions(): Promise<Transaction[]> {
@@ -18,9 +27,32 @@ export class TransactionsService {
     return this.transactionsRepository.findOne({ where: { id } });
   }
 
-  async createTransaction(transactionData: Transaction): Promise<Transaction> {
+  async createTransaction(
+    user: User,
+    transactionData: {
+      transaction: Transaction;
+      categoryLabel: string;
+    },
+  ): Promise<Transaction> {
     // TODO: implement create-transaction dto on which create transaction for validation
-    const transaction = this.transactionsRepository.create(transactionData);
+
+    const category = await this.categoriesService.getUserCategoryByLabel(
+      user,
+      transactionData.categoryLabel,
+    );
+
+    if (!category) {
+      throw new BadRequestException(
+        'Category you want to create transaction for does not exists',
+      );
+    }
+
+    const transaction = this.transactionsRepository.create(
+      transactionData.transaction,
+    );
+
+    transaction.category = category;
+
     return this.transactionsRepository.save(transaction);
   }
 
