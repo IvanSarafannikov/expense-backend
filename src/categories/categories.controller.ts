@@ -45,22 +45,35 @@ export class CategoriesController {
     return this.categoriesService.createCategory(user, category);
   }
 
-  // TODO: allow users to update only theirs categories and allow admins to update any user category
-
   @Patch(':categoryId')
   updateCategory(
+    @AuthUser() user: User,
     @Param('categoryId') categoryId: number,
     @Body() categoryDataToUpdate: Category,
   ): Promise<Category> {
-    return this.categoriesService.updateCategory(
-      categoryId,
-      categoryDataToUpdate,
-    );
+    if (user.role === UserRoles.ADMIN) {
+      return this.categoriesService.updateCategory(
+        categoryId,
+        categoryDataToUpdate,
+      );
+    } else {
+      return this.categoriesService.updateCategory(
+        categoryId,
+        categoryDataToUpdate,
+        user,
+      );
+    }
   }
 
-  // TODO: allow users to delete only theirs categories and allow admins to delete any user category
   @Delete(':categoryId')
-  deleteUser(@Param('categoryId') categoryId: number): Promise<null> {
-    return this.categoriesService.deleteCategoryById(categoryId);
+  deleteCategory(
+    @AuthUser() user: User,
+    @Param('categoryId') categoryId: number,
+  ): Promise<null> {
+    if (user.role === UserRoles.ADMIN) {
+      return this.categoriesService.deleteCategoryById(categoryId);
+    } else {
+      return this.categoriesService.deleteCategoryById(categoryId, user);
+    }
   }
 }

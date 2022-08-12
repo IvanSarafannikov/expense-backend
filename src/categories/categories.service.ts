@@ -85,13 +85,18 @@ export class CategoriesService {
   async updateCategory(
     id: number,
     categoryDataToUpdate: Category,
+    user?: User,
   ): Promise<Category> {
     // TODO: create update-category dto and update entity with it to prevent updating unwanted fields and validation
 
-    const category = await this.categoriesRepository.findOne({ where: { id } });
+    const category = user
+      ? await this.getUserCategoryById(user, id)
+      : await this.getCategoryById(id);
 
     if (!category) {
-      throw new BadRequestException('User you want to update does not exists');
+      throw new BadRequestException(
+        'Category you want to update does not exists',
+      );
     }
 
     if (category.label === 'Other') {
@@ -106,8 +111,10 @@ export class CategoriesService {
     });
   }
 
-  async deleteCategoryById(id: number): Promise<null> {
-    const category = await this.getCategoryById(id);
+  async deleteCategoryById(id: number, user?: User): Promise<null> {
+    const category = user
+      ? await this.getUserCategoryById(user, id)
+      : await this.getCategoryById(id);
 
     if (!category) {
       throw new BadRequestException(

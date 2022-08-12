@@ -70,12 +70,13 @@ export class TransactionsService {
   async updateTransaction(
     id: number,
     transactionDataToUpdate: Transaction,
+    user?: User,
   ): Promise<Transaction> {
     // TODO: create update-transaction dto and update entity with it to prevent updating unwanted fields and validation
 
-    const transaction = await this.transactionsRepository.findOne({
-      where: { id },
-    });
+    const transaction = user
+      ? await this.getUserTransactionById(user, id)
+      : await this.getTransactionById(id);
 
     if (!transaction) {
       throw new BadRequestException(

@@ -65,17 +65,24 @@ export class TransactionsController {
     return this.transactionsService.createTransaction(user, transactionData);
   }
 
-  // TODO: allow users to update only theirs transactions and allow admins to update any user transaction
-
   @Patch(':transactionId')
   updateTransaction(
+    @AuthUser() user: User,
     @Param('transactionId') transactionId: number,
     @Body() transactionDataToUpdate: Transaction,
   ): Promise<Transaction> {
-    return this.transactionsService.updateTransaction(
-      transactionId,
-      transactionDataToUpdate,
-    );
+    if (user.role === UserRoles.ADMIN) {
+      return this.transactionsService.updateTransaction(
+        transactionId,
+        transactionDataToUpdate,
+      );
+    } else {
+      return this.transactionsService.updateTransaction(
+        transactionId,
+        transactionDataToUpdate,
+        user,
+      );
+    }
   }
 
   @Delete(':transactionId')

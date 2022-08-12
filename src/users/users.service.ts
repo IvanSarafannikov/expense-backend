@@ -71,7 +71,6 @@ export class UsersService {
   }
 
   async deleteUserById(id: number): Promise<null> {
-    // TODO: delete related entities
     const result = await this.usersRepository.delete({ id });
 
     if (!result.affected) {
