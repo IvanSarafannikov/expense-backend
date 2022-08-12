@@ -23,8 +23,19 @@ export class TransactionsService {
     return this.transactionsRepository.find();
   }
 
+  async getUserTransactions(user: User): Promise<Transaction[]> {
+    return this.transactionsRepository.find({ where: { user } });
+  }
+
   async getTransactionById(id: number): Promise<Transaction | null> {
     return this.transactionsRepository.findOne({ where: { id } });
+  }
+
+  async getUserTransactionById(
+    user: User,
+    id: number,
+  ): Promise<Transaction | null> {
+    return this.transactionsRepository.findOne({ where: { user, id } });
   }
 
   async createTransaction(

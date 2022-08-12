@@ -30,6 +30,13 @@ export class CategoriesService {
     });
   }
 
+  async getUserCategoryById(user: User, id: number): Promise<Category | null> {
+    return this.categoriesRepository.findOne({
+      where: { user, id },
+      relations: { transactions: true },
+    });
+  }
+
   async getUserCategoryByLabel(
     user: User,
     label: string,
@@ -47,9 +54,10 @@ export class CategoriesService {
     });
   }
 
-  async createCategory(categoryData: Category): Promise<Category> {
+  async createCategory(user: User, categoryData: Category): Promise<Category> {
     // TODO: create-category dto to create entity with validation
     const category = this.categoriesRepository.create(categoryData);
+    category.user = user;
     return this.categoriesRepository.save(category);
   }
 

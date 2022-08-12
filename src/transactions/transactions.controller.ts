@@ -8,31 +8,53 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 import { AuthUser } from 'src/auth/decorators/user.decorator';
 import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
-import type { User } from 'src/users/user.entity';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { User, UserRoles } from 'src/users/user.entity';
 import type { Transaction } from './transaction.entity';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
+@UseGuards(AccessAuthGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-  @Get()
-  getUsers(): Promise<Transaction[]> {
+  @Get('all')
+  @UseGuards(RolesGuard)
+  @Roles(UserRoles.ADMIN)
+  getAllTransactions(): Promise<Transaction[]> {
     return this.transactionsService.getAllTransactions();
   }
 
+  @Get()
+  getCurrentUserTransactions(
+    @AuthUser() user: User,
+  ): Promise<Transaction[] | null> {
+    return this.transactionsService.getUserTransactions(user);
+  }
+
   @Get(':transactionId')
-  getUser(
+  getTransaction(
+    @AuthUser() user: User,
     @Param('transactionId') transactionId: number,
   ): Promise<Transaction | null> {
-    return this.transactionsService.getTransactionById(transactionId);
+    if (user.role) {
+      return this.transactionsService.getTransactionById(transactionId);
+    } else {
+      return this.transactionsService.getUserTransactionById(
+        user,
+        transactionId,
+      );
+    }
   }
+
+  // TODO: allow admins to create transactions for other users
 
   @Post()
   @UseGuards(AccessAuthGuard)
-  createUser(
+  createCurrentUserTransaction(
     @AuthUser() user: User,
     @Body()
     transactionData: {
@@ -43,8 +65,10 @@ export class TransactionsController {
     return this.transactionsService.createTransaction(user, transactionData);
   }
 
+  // TODO: allow users to update only theirs transactions and allow admins to update any user transaction
+
   @Patch(':transactionId')
-  updateUser(
+  updateTransaction(
     @Param('transactionId') transactionId: number,
     @Body() transactionDataToUpdate: Transaction,
   ): Promise<Transaction> {
@@ -55,7 +79,9 @@ export class TransactionsController {
   }
 
   @Delete(':transactionId')
-  deleteUser(@Param('transactionId') transactionId: number): Promise<null> {
+  deleteTransaction(
+    @Param('transactionId') transactionId: number,
+  ): Promise<null> {
     return this.transactionsService.deleteTransactionById(transactionId);
   }
 }
