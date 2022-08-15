@@ -11,7 +11,6 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { AuthUser } from 'src/auth/decorators/user.decorator';
 import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-
 import { User, UserRoles } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -19,6 +18,7 @@ import { UsersService } from './users.service';
 @UseGuards(AccessAuthGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
 
   @Get('all')
   @UseGuards(RolesGuard)

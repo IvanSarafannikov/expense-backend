@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesService } from 'src/categories/categories.service';
 import type { Repository } from 'typeorm';
 import { User } from './user.entity';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -32,6 +33,7 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { username } });
   }
 
+
   async getUserByRefreshToken(refreshToken: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { refreshToken } });
   }
@@ -48,9 +50,10 @@ export class UsersService {
 
     user.categories = categories;
 
-    await this.usersRepository.save(user);
+    const hashedPassword = await bcrypt.hash(userData.password, 5);
+    user.password = hashedPassword;
 
-    return user;
+    return await this.usersRepository.save(user);
   }
 
   async updateUser(id: number, userDataToUpdate: User): Promise<User> {
@@ -62,7 +65,21 @@ export class UsersService {
       throw new BadRequestException('User you want to update does not exists');
     }
 
+    if (userDataToUpdate.password) {
+      const hashedPassword = await bcrypt.hash(userDataToUpdate.password, 5);
+
+      userDataToUpdate.password = hashedPassword;
+    }
+
     return this.usersRepository.save({ ...user, ...userDataToUpdate });
+  }
+
+  async updateUserRefreshToken(
+    id: number,
+    refreshToken: string,
+  ): Promise<null> {
+    await this.usersRepository.update({ id }, { refreshToken });
+    return null;
   }
 
   async deleteUserRefreshToken(id: number): Promise<null> {

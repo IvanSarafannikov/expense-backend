@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+// import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 import { TransactionsModule } from './transactions/transactions.module';
 import { Transaction } from './transactions/transaction.entity';
 import { CategoriesModule } from './categories/categories.module';
@@ -24,6 +26,7 @@ import { Category } from './categories/category.entity';
       },
     }),
     UsersModule,
+    AuthModule,
     CategoriesModule,
     TransactionsModule,
   ],
