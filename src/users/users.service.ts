@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
 import { User } from './user.entity';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -30,8 +31,11 @@ export class UsersService {
     // TODO: implement create-user dto on which create user for better control
     // TODO: create related entities
     const user = this.usersRepository.create(userData);
-    await this.usersRepository.save(user);
-    return user;
+
+    const hashedPassword = await bcrypt.hash(userData.password, 5);
+    user.password = hashedPassword;
+
+    return await this.usersRepository.save(user);
   }
 
   async updateUser(id: number, userDataToUpdate: User): Promise<User> {
@@ -43,9 +47,23 @@ export class UsersService {
       throw new BadRequestException('User you want to update does not exists');
     }
 
+    if (userDataToUpdate.password) {
+      const hashedPassword = await bcrypt.hash(userDataToUpdate.password, 5);
+
+      userDataToUpdate.password = hashedPassword;
+    }
+
     return this.usersRepository.save({ ...user, ...userDataToUpdate });
   }
 
+
+  async updateUserRefreshToken(
+    id: number,
+    refreshToken: string,
+  ): Promise<null> {
+    await this.usersRepository.update({ id }, { refreshToken });
+    return null;
+  }
 
   async deleteUserRefreshToken(id: number): Promise<null> {
     await this.usersRepository.update({ id }, { refreshToken: '' });

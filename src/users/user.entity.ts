@@ -23,7 +23,7 @@ export class User {
   })
   role!: UserRoles;
 
-  @Column()
+  @Column({ length: '100' })
   password!: string;
 
   @Column({ nullable: true })
