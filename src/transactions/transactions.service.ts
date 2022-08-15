@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesService } from 'src/categories/categories.service';
 import type { User } from 'src/users/user.entity';
 import type { Repository } from 'typeorm';
+import type { CreateTransactionDto } from './dto/create-transaction.dto';
+import type { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transaction.entity';
 
 @Injectable()
@@ -24,11 +26,15 @@ export class TransactionsService {
   }
 
   async getUserTransactions(user: User): Promise<Transaction[]> {
-    return this.transactionsRepository.find({ where: { user } });
+    return this.transactionsRepository.find({
+      where: { user },
+    });
   }
 
   async getTransactionById(id: number): Promise<Transaction | null> {
-    return this.transactionsRepository.findOne({ where: { id } });
+    return this.transactionsRepository.findOne({
+      where: { id },
+    });
   }
 
   async getUserTransactionById(
@@ -40,16 +46,11 @@ export class TransactionsService {
 
   async createTransaction(
     user: User,
-    transactionData: {
-      transaction: Transaction;
-      categoryLabel: string;
-    },
+    createTransactionDto: CreateTransactionDto,
   ): Promise<Transaction> {
-    // TODO: implement create-transaction dto on which create transaction for validation
-
     const category = await this.categoriesService.getUserCategoryByLabel(
       user,
-      transactionData.categoryLabel,
+      createTransactionDto.categoryLabel,
     );
 
     if (!category) {
@@ -58,10 +59,10 @@ export class TransactionsService {
       );
     }
 
-    const transaction = this.transactionsRepository.create(
-      transactionData.transaction,
-    );
+    const transaction =
+      this.transactionsRepository.create(createTransactionDto);
 
+    transaction.user = user;
     transaction.category = category;
 
     return this.transactionsRepository.save(transaction);
@@ -69,11 +70,9 @@ export class TransactionsService {
 
   async updateTransaction(
     id: number,
-    transactionDataToUpdate: Transaction,
+    updateTransactionDto: UpdateTransactionDto,
     user?: User,
   ): Promise<Transaction> {
-    // TODO: create update-transaction dto and update entity with it to prevent updating unwanted fields and validation
-
     const transaction = user
       ? await this.getUserTransactionById(user, id)
       : await this.getTransactionById(id);
@@ -86,7 +85,7 @@ export class TransactionsService {
 
     return this.transactionsRepository.save({
       ...transaction,
-      ...transactionDataToUpdate,
+      ...updateTransactionDto,
     });
   }
 

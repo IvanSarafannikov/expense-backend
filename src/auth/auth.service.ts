@@ -13,7 +13,8 @@ import {
   refreshTokenPayload,
 } from './tokens.settings';
 import bcrypt from 'bcrypt';
-
+import type { CreateUserDto } from 'src/users/dto/create-user.dto';
+import type { LoginUserDto } from 'src/users/dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,22 +23,21 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  async register(userDto: User): Promise<{
+  async register(createUserDto: CreateUserDto): Promise<{
     user: User;
     tokens: { accessToken: string; refreshToken: string };
   }> {
-    // TODO: create-user dto for validation
     const savedUser = await this.usersService.getUserByUsername(
-      userDto.username,
+      createUserDto.username,
     );
 
     if (savedUser) {
       throw new ConflictException(
-        `username ${userDto.username} is already in use`,
+        `username ${createUserDto.username} is already in use`,
       );
     }
 
-    const user = await this.usersService.createUser(userDto);
+    const user = await this.usersService.createUser(createUserDto);
 
     const accessToken = this.generateAccessToken(user);
     const refreshToken = this.generateRefreshToken(user);
@@ -51,11 +51,10 @@ export class AuthService {
     };
   }
 
-  async login(candidate: { username: string; password: string }): Promise<{
+  async login(candidate: LoginUserDto): Promise<{
     user: User;
     tokens: { accessToken: string; refreshToken: string };
   }> {
-    // TODO: dto for validation
     const user = await this.usersService.getUserByUsername(candidate.username);
 
     if (!user) {
@@ -74,13 +73,11 @@ export class AuthService {
     const accessToken = this.generateAccessToken(user);
     const refreshToken = this.generateRefreshToken(user);
 
-    const userWithRefreshToken = await this.usersService.updateUser(user.id, {
-      ...user,
-      refreshToken,
-    });
+    await this.usersService.updateUserRefreshToken(user.id, refreshToken);
+    user.refreshToken = refreshToken;
 
     return {
-      user: userWithRefreshToken,
+      user,
       tokens: { accessToken, refreshToken },
     };
   }

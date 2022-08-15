@@ -8,6 +8,8 @@ import type { User } from 'src/users/user.entity';
 import type { Repository } from 'typeorm';
 import { Category } from './category.entity';
 import { defaultCategories } from './default.categories';
+import type { CreateCategoryDto } from './dto/create-category.dto';
+import type { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -58,18 +60,20 @@ export class CategoriesService {
     });
   }
 
-  async createCategory(user: User, categoryData: Category): Promise<Category> {
-    // TODO: create-category dto to create entity with validation
+  async createCategory(
+    user: User,
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<Category> {
     const existingCategory = await this.getUserCategoryByLabel(
       user,
-      categoryData.label,
+      createCategoryDto.label,
     );
 
     if (existingCategory) {
       throw new ConflictException('Category with this label already exists');
     }
 
-    const category = this.categoriesRepository.create(categoryData);
+    const category = this.categoriesRepository.create(createCategoryDto);
     category.user = user;
     return this.categoriesRepository.save(category);
   }
@@ -84,11 +88,9 @@ export class CategoriesService {
 
   async updateCategory(
     id: number,
-    categoryDataToUpdate: Category,
+    updateCategoryDto: UpdateCategoryDto,
     user?: User,
   ): Promise<Category> {
-    // TODO: create update-category dto and update entity with it to prevent updating unwanted fields and validation
-
     const category = user
       ? await this.getUserCategoryById(user, id)
       : await this.getCategoryById(id);
@@ -107,7 +109,7 @@ export class CategoriesService {
 
     return this.categoriesRepository.save({
       ...category,
-      ...categoryDataToUpdate,
+      ...updateCategoryDto,
     });
   }
 

@@ -11,6 +11,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { AuthUser } from 'src/auth/decorators/user.decorator';
 import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserRoles } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -18,7 +19,6 @@ import { UsersService } from './users.service';
 @UseGuards(AccessAuthGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
-
 
   @Get('all')
   @UseGuards(RolesGuard)
@@ -48,9 +48,9 @@ export class UsersController {
   @Patch()
   updateCurrentUser(
     @AuthUser() user: User,
-    @Body() userDataToUpdate: User,
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    return this.usersService.updateUser(user.id, userDataToUpdate);
+    return this.usersService.updateUser(user.id, updateUserDto);
   }
 
   @Patch(':userId')
@@ -58,9 +58,9 @@ export class UsersController {
   @Roles(UserRoles.ADMIN)
   updateUser(
     @Param('userId') userId: number,
-    @Body() userDataToUpdate: User,
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    return this.usersService.updateUser(userId, userDataToUpdate);
+    return this.usersService.updateUser(userId, updateUserDto);
   }
 
   @Delete()

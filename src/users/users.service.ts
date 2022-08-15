@@ -9,6 +9,8 @@ import { CategoriesService } from 'src/categories/categories.service';
 import type { Repository } from 'typeorm';
 import { User } from './user.entity';
 import bcrypt from 'bcrypt';
+import type { CreateUserDto } from './dto/create-user.dto';
+import type { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -33,14 +35,12 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { username } });
   }
 
-
   async getUserByRefreshToken(refreshToken: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { refreshToken } });
   }
 
-  async createUser(userData: User): Promise<User> {
-    // TODO: implement create-user dto on which create user for better control
-    const user = this.usersRepository.create(userData);
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.usersRepository.create(createUserDto);
 
     await this.usersRepository.save(user);
 
@@ -50,28 +50,28 @@ export class UsersService {
 
     user.categories = categories;
 
-    const hashedPassword = await bcrypt.hash(userData.password, 5);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 5);
     user.password = hashedPassword;
 
     return await this.usersRepository.save(user);
   }
 
-  async updateUser(id: number, userDataToUpdate: User): Promise<User> {
-    // TODO: create update-user dto and update entity with it to prevent updating unwanted fields and validation
-
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new BadRequestException('User you want to update does not exists');
     }
 
-    if (userDataToUpdate.password) {
-      const hashedPassword = await bcrypt.hash(userDataToUpdate.password, 5);
+    const hashedPassword = updateUserDto.password
+      ? await bcrypt.hash(updateUserDto.password, 5)
+      : undefined;
 
-      userDataToUpdate.password = hashedPassword;
-    }
-
-    return this.usersRepository.save({ ...user, ...userDataToUpdate });
+    return this.usersRepository.save({
+      ...user,
+      ...updateUserDto,
+      password: hashedPassword || user.password,
+    });
   }
 
   async updateUserRefreshToken(

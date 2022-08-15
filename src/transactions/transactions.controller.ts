@@ -13,6 +13,8 @@ import { AuthUser } from 'src/auth/decorators/user.decorator';
 import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { User, UserRoles } from 'src/users/user.entity';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import type { Transaction } from './transaction.entity';
 import { TransactionsService } from './transactions.service';
 
@@ -29,9 +31,7 @@ export class TransactionsController {
   }
 
   @Get()
-  getCurrentUserTransactions(
-    @AuthUser() user: User,
-  ): Promise<Transaction[] | null> {
+  getCurrentUserTransactions(@AuthUser() user: User): Promise<Transaction[]> {
     return this.transactionsService.getUserTransactions(user);
   }
 
@@ -57,29 +57,29 @@ export class TransactionsController {
   createCurrentUserTransaction(
     @AuthUser() user: User,
     @Body()
-    transactionData: {
-      transaction: Transaction;
-      categoryLabel: string;
-    },
+    createTransactionDto: CreateTransactionDto,
   ): Promise<Transaction> {
-    return this.transactionsService.createTransaction(user, transactionData);
+    return this.transactionsService.createTransaction(
+      user,
+      createTransactionDto,
+    );
   }
 
   @Patch(':transactionId')
   updateTransaction(
     @AuthUser() user: User,
     @Param('transactionId') transactionId: number,
-    @Body() transactionDataToUpdate: Transaction,
+    @Body() updateTransactionDto: UpdateTransactionDto,
   ): Promise<Transaction> {
     if (user.role === UserRoles.ADMIN) {
       return this.transactionsService.updateTransaction(
         transactionId,
-        transactionDataToUpdate,
+        updateTransactionDto,
       );
     } else {
       return this.transactionsService.updateTransaction(
         transactionId,
-        transactionDataToUpdate,
+        updateTransactionDto,
         user,
       );
     }

@@ -13,6 +13,8 @@ import { CategoriesService } from './categories.service';
 import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
 import { AuthUser } from 'src/auth/decorators/user.decorator';
 import { User, UserRoles } from 'src/users/user.entity';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('categories')
 @UseGuards(AccessAuthGuard)
@@ -40,26 +42,26 @@ export class CategoriesController {
   @Post()
   createCurrentUserCategory(
     @AuthUser() user: User,
-    @Body() category: Category,
+    @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<Category> {
-    return this.categoriesService.createCategory(user, category);
+    return this.categoriesService.createCategory(user, createCategoryDto);
   }
 
   @Patch(':categoryId')
   updateCategory(
     @AuthUser() user: User,
     @Param('categoryId') categoryId: number,
-    @Body() categoryDataToUpdate: Category,
+    @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
     if (user.role === UserRoles.ADMIN) {
       return this.categoriesService.updateCategory(
         categoryId,
-        categoryDataToUpdate,
+        updateCategoryDto,
       );
     } else {
       return this.categoriesService.updateCategory(
         categoryId,
-        categoryDataToUpdate,
+        updateCategoryDto,
         user,
       );
     }
