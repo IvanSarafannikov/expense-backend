@@ -4,6 +4,7 @@
     "database",
     "linter",
     "module",
-    "git"
+    "git",
+    "exception"
   ]
 }

@@ -1,19 +1,21 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
 import type { User } from 'src/users/user.entity';
 import { AuthService } from './auth.service';
+import { RefreshAuthGuard } from './guards/refresh-auth.guard';
 import { refreshTokenCookieOptios } from './tokens.settings';
+import { AuthUser } from './decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auhtService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   register(@Body() userDto: User): Promise<{
     user: User;
     tokens: { accessToken: string; refreshToken: string };
   }> {
-    return this.auhtService.register(userDto);
+    return this.authService.register(userDto);
   }
 
   @Post('login')
@@ -24,7 +26,7 @@ export class AuthController {
     user: User;
     tokens: { accessToken: string; refreshToken: string };
   }> {
-    const responseData = await this.auhtService.login(candidate);
+    const responseData = await this.authService.login(candidate);
 
     response.cookie(
       'refreshToken',
@@ -35,19 +37,19 @@ export class AuthController {
   }
 
   @Get('refresh')
-  async refresh(@Req() request: Request): Promise<{ accessToken: string }> {
-    const accessToken = await this.auhtService.refresh(
-      request.cookies['refreshToken'],
-    );
+  @UseGuards(RefreshAuthGuard)
+  refresh(@AuthUser() user: User): { accessToken: string } {
+    const accessToken = this.authService.generateAccessToken(user);
     return { accessToken };
   }
 
   @Post('logout')
+  @UseGuards(RefreshAuthGuard)
   async logout(
-    @Req() request: Request,
+    @AuthUser() user: User,
     @Res({ passthrough: true }) response: Response,
   ): Promise<null> {
-    await this.auhtService.logout(request.cookies['refreshToken']);
+    await this.authService.logout(user);
 
     response.clearCookie('refreshToken', refreshTokenCookieOptios);
 
