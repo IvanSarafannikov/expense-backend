@@ -14,6 +14,7 @@ import {
 } from './tokens.settings';
 import bcrypt from 'bcrypt';
 
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -56,6 +57,7 @@ export class AuthService {
   }> {
     // TODO: dto for validation
     const user = await this.usersService.getUserByUsername(candidate.username);
+
     if (!user) {
       throw new UnauthorizedException('wrong username or password');
     }
