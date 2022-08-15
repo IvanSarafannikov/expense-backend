@@ -6,8 +6,12 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import type { User } from './user.entity';
+import { AccessAuthGuard } from 'src/auth/guards/access-auth.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { User, UserRoles } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -15,6 +19,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
+  @Roles(UserRoles.ADMIN)
   getUsers(): Promise<User[]> {
     return this.usersService.getAllUsers();
   }
