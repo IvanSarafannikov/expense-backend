@@ -5,14 +5,15 @@ Read the requirements for the project [here](./Requirements.md)
 ## Tech stack
 
 - Nest.js
+- TypeORM
 
 ## Development steps
 
 - [x] initialize the project
 - [x] add husky, commitlint, etc.
 - [ ] define entities
-  - [ ] User
-  - [ ] Session
+  - [x] User
+  - [x] Session
   - [ ] ExpenseCategory
   - [ ] Transaction
 - [ ] create `Auth` modules
