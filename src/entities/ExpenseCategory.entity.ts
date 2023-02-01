@@ -10,27 +10,20 @@ import {
 
 import { User } from 'src/entities/User.entity';
 
-@Entity('Sessions')
-export class Session extends BaseEntity {
+@Entity('ExpenseCategories')
+export class ExpenseCategory extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, (user) => user.sessions)
+  @Column()
+  label: string;
+
+  @ManyToOne(() => User, (user) => user.expenseCategories)
   user: User;
 
-  @Column({
-    length: 30,
-  })
-  deviceName: string;
-
-  @Column({
-    length: 1024,
-  })
-  refreshToken: string;
-
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: string;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: string;
 }

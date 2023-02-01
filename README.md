@@ -11,11 +11,14 @@ Read the requirements for the project [here](./Requirements.md)
 
 - [x] initialize the project
 - [x] add husky, commitlint, etc.
-- [ ] define entities
+- [x] define entities
   - [x] User
   - [x] Session
-  - [ ] ExpenseCategory
-  - [ ] Transaction
+  - [x] ExpenseCategory
+  - [x] Transaction
+- [ ] setup TypeORM
+- [ ] add Postgres in Docker
+- [ ] setup Swagger
 - [ ] create `Auth` modules
   - [ ] endpoints
     - [ ] POST register
@@ -36,3 +39,4 @@ Read the requirements for the project [here](./Requirements.md)
     - [ ] GET ballance (get the current balance)
   - [ ] write Swagger docs
   - [ ] write e2e tests
+- [ ] deploy
