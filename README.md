@@ -30,7 +30,7 @@
 - ```ESLint``` + ```Prettier```
 - ```OpenAPI```/```Swagger```
 
-> Для typescript рекомендовано використовувати темплейт ```Node 16 + Strictest``` з https://github.com/tsconfig/bases
+> Для typescript рекомендовано використовувати темплейт ```Node 18 + Strictest``` з https://github.com/tsconfig/bases
 > 
 > Приклад готового конфігу можна знайти в файлі [tsconfig.json]()
 
