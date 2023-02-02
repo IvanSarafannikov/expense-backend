@@ -5,16 +5,20 @@ Read the requirements for the project [here](./Requirements.md)
 ## Tech stack
 
 - Nest.js
+- TypeORM
 
 ## Development steps
 
 - [x] initialize the project
 - [x] add husky, commitlint, etc.
-- [ ] define entities
-  - [ ] User
-  - [ ] Session
-  - [ ] ExpenseCategory
-  - [ ] Transaction
+- [x] define entities
+  - [x] User
+  - [x] Session
+  - [x] ExpenseCategory
+  - [x] Transaction
+- [ ] setup TypeORM
+- [ ] add Postgres in Docker
+- [ ] setup Swagger
 - [ ] create `Auth` modules
   - [ ] endpoints
     - [ ] POST register
@@ -35,3 +39,4 @@ Read the requirements for the project [here](./Requirements.md)
     - [ ] GET ballance (get the current balance)
   - [ ] write Swagger docs
   - [ ] write e2e tests
+- [ ] deploy
