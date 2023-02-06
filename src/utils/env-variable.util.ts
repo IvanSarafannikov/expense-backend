@@ -1,3 +1,10 @@
+/**
+ * Env variable helper
+ *
+ * @param name variable name
+ * @param required variable is required
+ * @returns env variable
+ */
 const getVariable = (name: string, required: boolean) => {
   const variable = process.env[name];
 
@@ -17,7 +24,7 @@ const getVariable = (name: string, required: boolean) => {
  * @param required variable is required, by `default` true
  * @returns env variable
  */
-const number = (name: string, required = true) => {
+const getNumberVariable = (name: string, required = true) => {
   const variable = getVariable(name, required);
 
   return parseInt(variable);
@@ -32,7 +39,7 @@ const number = (name: string, required = true) => {
  * @param required variable is required, by `default` true
  * @returns env variable
  */
-const string = (name: string, required = true) => {
+const getStringVariable = (name: string, required = true) => {
   return getVariable(name, required);
 };
 
@@ -45,14 +52,59 @@ const string = (name: string, required = true) => {
  * @param required variable is required, by `default` true
  * @returns env variable
  */
-const boolean = (name: string, required = true) => {
+const getBooleanVariable = (name: string, required = true) => {
   const variable = getVariable(name, required);
 
   return Boolean(variable);
 };
 
+/**
+ * Decorator to set env variable
+ *
+ * @param name variable name
+ * @param required variable is required
+ */
+export function SetEnvAsString(
+  name: string,
+  required = true,
+): PropertyDecorator {
+  return (target: Record<string, any>, key: string | symbol) => {
+    target[key as string] = getStringVariable(name, required);
+  };
+}
+
+/**
+ * Decorator to set env variable
+ *
+ * @param name variable name
+ * @param required variable is required
+ */
+export function SetEnvAsNumber(
+  name: string,
+  required = true,
+): PropertyDecorator {
+  return (target: Record<string, any>, key: string | symbol) => {
+    target[key as string] = getNumberVariable(name, required);
+  };
+}
+
+/**
+ * Decorator to set env variable
+ *
+ * @param name variable name
+ * @param required variable is required
+ */
+export function SetEnvAsBoolean(
+  name: string,
+  required = true,
+): PropertyDecorator {
+  return (target: Record<string, any>, key: string | symbol) => {
+    target[key as string] = getStringVariable(name, required);
+  };
+}
+
 export const getEnv = {
-  number,
-  string,
-  boolean,
+  number: getNumberVariable,
+  string: getStringVariable,
+  boolean: getBooleanVariable,
 };

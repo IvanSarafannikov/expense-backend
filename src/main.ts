@@ -1,4 +1,3 @@
-// Setup env variables before import other modules
 import * as dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 
@@ -6,14 +5,21 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 
-import { AppModule } from './app.module';
-import { getEnv } from 'src/utils/env-variable.util';
+import { AppModule } from '@Src/app.module';
+import { getEnv } from '@Src/utils/env-variable.util';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const PORT = getEnv.number('PORT');
 
   // Setup middleware
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+    }),
+  );
   app.enableCors();
   app.use(cookieParser());
 

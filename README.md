@@ -5,7 +5,47 @@ Read the requirements for the project [here](./Requirements.md)
 ## Tech stack
 
 - Nest.js
-- TypeORM
+- Prisma - ORM
+- PostgreSQL in Docker
+- Class-validator - for validation
+- Jest - testing
+
+Development environment:
+
+- Husky - git hooks
+- commitlint - commit message validation
+- lint-staged - lint in staged
+- ESLint
+- Prettier
+- EditorConfig
+
+## Local run
+
+Install packages:
+
+```sh
+yarn install
+```
+
+Start Docker:
+
+```sh
+docker compose up -d
+```
+
+> or user your own database, but then you will need to update .env file
+
+Start servicer:
+
+```sh
+yarn start
+```
+
+Run test:
+
+```sh
+yarn test
+```
 
 ## Development steps
 
@@ -16,20 +56,21 @@ Read the requirements for the project [here](./Requirements.md)
   - [x] Session
   - [x] ExpenseCategory
   - [x] Transaction
-- [ ] setup TypeORM
-- [ ] add Postgres in Docker
-- [ ] setup Swagger
-- [ ] create `Auth` modules
-  - [ ] endpoints
-    - [ ] POST register
-    - [ ] POST login
-    - [ ] GET logout
-    - [ ] GET refresh
-    - [ ] DELETE delete session
-    - [ ] POST update session
-    - [ ] POST change password
-  - [ ] write Swagger docs
-  - [ ] write e2e tests
+- [x] setup Prisma
+- [x] add Postgres in Docker
+- [x] setup Swagger
+- [x] create `Auth` modules
+  - [x] endpoints
+    - [x] POST register
+    - [x] POST login
+    - [x] GET logout
+    - [x] GET refresh
+    - [x] GET sessions
+    - [x] DELETE delete session
+    - [x] POST update session
+    - [x] POST change password
+  - [x] write Swagger docs
+  - [x] write e2e tests
 - [ ] create `Expense` module
   - [ ] endpoints
     - [ ] POST transaction

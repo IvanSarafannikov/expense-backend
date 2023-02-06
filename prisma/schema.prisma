@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @db.VarChar(320)
+  username    String   @db.VarChar(20)
+  displayName String?  @db.VarChar(40)
+  password    String   @db.VarChar(60)
+  // role        UserRole @default(user)
+
+  sessions          Session[]
+  expenseCategories ExpenseCategory[]
+  transactions      Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Users")
+}
+
+model Session {
+  id String @id @default(uuid())
+
+  deviceName   String @db.VarChar(30)
+  refreshToken String @db.VarChar(1024)
+  user         User   @relation(fields: [userId], references: [id])
+  userId       String @db.VarChar(36)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Sessions")
+}
+
+model ExpenseCategory {
+  id String @id @default(uuid())
+
+  label String @db.VarChar(30)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.VarChar(36)
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ExpenseCategories")
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  label  String   @db.VarChar(30)
+  date   DateTime
+  amount Float
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.VarChar(36)
+
+  expenseCategory   ExpenseCategory @relation(fields: [expenseCategoryId], references: [id])
+  expenseCategoryId String          @db.VarChar(36)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Transactions")
+}
+
+enum UserRole {
+  admin
+  user
+}
