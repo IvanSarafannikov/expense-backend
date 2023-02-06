@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import Prisma from '@prisma/client';
 
 import { prisma } from '@Src/shared/prisma';
 
 @Injectable()
 export class SessionService {
-  constructor() { }
+  constructor() {}
 
   async create(data: Prisma.Prisma.SessionCreateArgs) {
     return await prisma.session.create(data);
@@ -38,7 +38,7 @@ export class SessionService {
         callback();
       }
 
-      throw new BadRequestException('Session not exists');
+      throw new NotFoundException('Session does not exists');
     }
 
     return sessionCandidate;
@@ -57,7 +57,7 @@ export class SessionService {
         callback();
       }
 
-      throw new BadRequestException('Session not exists');
+      throw new NotFoundException('Session does not exists');
     }
 
     return await this.update(data);

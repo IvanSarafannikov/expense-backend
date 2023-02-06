@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -11,20 +13,27 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBasicAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBasicAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { AuthService } from '@Module/auth/auth.service';
-import {
-  JwtProtectedRequest,
-  LocalProtectedRequest,
-} from '@Module/auth/interfaces/protected-request.interface';
+import { JwtProtectedRequest } from '@Module/auth/interfaces/protected-request.interface';
 import { JwtAuthGuard } from '@Module/auth/jwt-auth.guard';
 import { JwtTokensPair } from '@Module/auth/tokens.service';
 import {
   ChangePasswordDto,
   LogInDto,
   LogInResponseDto,
+  RefreshDto,
   RegisterDto,
   SessionsDto,
   UpdateSessionDto,
@@ -38,14 +47,20 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @ApiOperation({ description: 'Register new user' })
+  @ApiCreatedResponse({ description: 'User registered successfully' })
+  @ApiBadRequestResponse({ description: 'Username or email already exists' })
   @Post('register')
   async register(@Body() body: RegisterDto) {
     return this.authService.register(body);
   }
 
   @ApiOperation({ description: 'Log-in user' })
-  @ApiResponse({ type: LogInResponseDto })
-  @Get('login')
+  @ApiBadRequestResponse({
+    description: 'Bad password or user does not exists',
+  })
+  @ApiCreatedResponse({ description: 'User logged-in successfully', type: LogInResponseDto })
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
   async logIn(
     @Res() res: Response,
     @Body() body: LogInDto,
@@ -57,6 +72,7 @@ export class AuthController {
   }
 
   @ApiOperation({ description: 'Log-out user' })
+  @ApiOkResponse({ description: 'User logged-out successfully' })
   @Get('logout')
   async logOut(
     @Res() res: Response,
@@ -69,6 +85,13 @@ export class AuthController {
   }
 
   @ApiOperation({ description: 'Refresh tokens' })
+  @ApiOkResponse({
+    description: 'Tokens refreshed successfully',
+    type: RefreshDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad refresh token or refresh token expired',
+  })
   @Get('refresh')
   async refresh(
     @Res() res: Response,
@@ -80,7 +103,10 @@ export class AuthController {
   }
 
   @ApiOperation({ description: 'Get sessions' })
-  @ApiResponse({ type: [SessionsDto] })
+  @ApiOkResponse({
+    description: 'Session received successfully',
+    type: [SessionsDto],
+  })
   @ApiBasicAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Get('session')
@@ -89,7 +115,14 @@ export class AuthController {
   }
 
   @ApiOperation({ description: 'Delete session with specified ID' })
-  @ApiParam({ name: 'id', type: 'string', example: '0f34aaaa-8194-4c90-902c-1155163c9911' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    example: '0f34aaaa-8194-4c90-902c-1155163c9911',
+  })
+  @ApiOkResponse({ description: 'Session deleted successfully' })
+  @ApiBadRequestResponse({ description: 'This session does not belong to you' })
+  @ApiNotFoundResponse({ description: 'Session does not exists' })
   @ApiBasicAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Delete('session/:id')
@@ -101,8 +134,16 @@ export class AuthController {
   }
 
   @ApiOperation({ description: 'Update session name' })
-  @ApiParam({ name: 'id', type: 'string', example: '0f34aaaa-8194-4c90-902c-1155163cac76' })
-  @ApiResponse({ type: SessionsDto })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    example: '0f34aaaa-8194-4c90-902c-1155163cac76',
+  })
+  @ApiOkResponse({
+    description: 'Session updated successfully',
+    type: SessionsDto,
+  })
+  @ApiNotFoundResponse({ description: 'Session does not exists' })
   @ApiBasicAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Patch('session/:id')
@@ -114,6 +155,8 @@ export class AuthController {
   }
 
   @ApiOperation({ description: 'Change user password' })
+  @ApiOkResponse({ description: 'Password changed successfully' })
+  @ApiBadRequestResponse({ description: 'Bad old password' })
   @ApiBasicAuth('Bearer')
   @UseGuards(JwtAuthGuard)
   @Patch('change-password')

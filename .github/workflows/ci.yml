@@ -1,0 +1,32 @@
+name: 'CI'
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgresql:
+        image: postgres:10.10
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: 1234
+          POSTGRES_DB: expenses
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+          cache: yarn
+      - name: Install packages
+        run: yarn install
+      - name: Lint code
+        run: yarn run lint
+      - name: Run tests
+        run: yarn test

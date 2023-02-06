@@ -2,12 +2,57 @@
 
 Read the requirements for the project [here](./Requirements.md)
 
+The project implements two modules:
+
+- authorization
+- expenses
+
+**Authorization** module allows:
+
+- register new users
+- log-in user
+- log-out user
+- refresh tokens
+- change password
+- get sessions
+- update session
+- delete session
+
+Once the user changes the password, all sessions will be deleted.
+
+**Expenses** module allows:
+
+- create own expense category
+- get own expense categories
+- update own expense category
+- delete own expense category
+- create transaction
+- get transactions
+- update transaction
+- delete transaction
+- get ballance
+- create base expense category (available only for admin)
+- get base expense category (available only for admin)
+- update base expense category (available only for admin)
+- delete base expense category (available only for admin)
+
+The `expense category` is specific to each user, which means that if I create my own expense category, only I can interact with it.
+
+The `base expense category` is general list of categories that automatically generates once user register. This means that each user will have a list of default categories like:
+
+- Others
+- Food
+- Transport
+- Shopping
+
+If a user deletes their own expense category, then all transactions related to this category will be moved to the `Other` expense category.
+
 ## Tech stack
 
 - Nest.js
 - Prisma - ORM
-- PostgreSQL in Docker
-- Class-validator - for validation
+- PostgreSQL in Docker - database
+- Class-validator - validation
 - Jest - testing
 
 Development environment:
@@ -35,6 +80,12 @@ docker compose up -d
 
 > or user your own database, but then you will need to update .env file
 
+Run migrations:
+
+```sh
+yarn migrate:dev
+```
+
 Start servicer:
 
 ```sh
@@ -46,38 +97,3 @@ Run test:
 ```sh
 yarn test
 ```
-
-## Development steps
-
-- [x] initialize the project
-- [x] add husky, commitlint, etc.
-- [x] define entities
-  - [x] User
-  - [x] Session
-  - [x] ExpenseCategory
-  - [x] Transaction
-- [x] setup Prisma
-- [x] add Postgres in Docker
-- [x] setup Swagger
-- [x] create `Auth` modules
-  - [x] endpoints
-    - [x] POST register
-    - [x] POST login
-    - [x] GET logout
-    - [x] GET refresh
-    - [x] GET sessions
-    - [x] DELETE delete session
-    - [x] POST update session
-    - [x] POST change password
-  - [x] write Swagger docs
-  - [x] write e2e tests
-- [ ] create `Expense` module
-  - [ ] endpoints
-    - [ ] POST transaction
-    - [ ] PATCH transaction
-    - [ ] DELETE transaction
-    - [ ] GET transactions
-    - [ ] GET ballance (get the current balance)
-  - [ ] write Swagger docs
-  - [ ] write e2e tests
-- [ ] deploy

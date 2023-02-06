@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import Prisma from '@prisma/client';
 import * as bcryptjs from 'bcryptjs';
 
 import {
@@ -10,9 +9,9 @@ import {
 } from '@Module/auth/dto/auth.dto';
 import { SessionService } from '@Module/auth/session.service';
 import { TokensService } from '@Module/auth/tokens.service';
+import { ExpenseCategoryService } from '@Module/expense/expense-category.service';
 import { UserService } from '@Module/user/user.service';
 import { SetEnvAsNumber } from '@Src/utils/env-variable.util';
-import { useContainer } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +22,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly tokensService: TokensService,
     private readonly sessionService: SessionService,
+    private readonly expenseCategoryService: ExpenseCategoryService,
   ) { }
 
   async register(data: RegisterDto) {
@@ -50,28 +50,30 @@ export class AuthService {
 
     const passwordHash = bcryptjs.hashSync(data.password, this.passwordSalt);
 
-    await this.userService.create({
+    const newUser = await this.userService.create({
       data: {
         ...data,
         password: passwordHash,
       },
     });
 
-    // TODO create list of basic expense categories
+    await this.expenseCategoryService.generateBaseCategoriesForUser(newUser.id);
   }
 
   async logIn(data: LogInDto, deviceName: string) {
-    const userCandidate = await this.userService.getExists({
+    const userCandidate = await this.userService.getExisting({
       where: {
         email: data.email,
       },
-    })
+    });
 
     if (!bcryptjs.compareSync(data.password, userCandidate.password)) {
       throw new BadRequestException('Bad password');
     }
 
-    const tokens = await this.tokensService.generatePairTokens({ id: userCandidate.id });
+    const tokens = await this.tokensService.generatePairTokens({
+      id: userCandidate.id,
+    });
 
     await this.sessionService.create({
       data: {
@@ -154,7 +156,7 @@ export class AuthService {
     });
 
     if (candidate.userId !== userId) {
-      throw new BadRequestException('This session not belongs to you');
+      throw new BadRequestException('This session does not belong to you');
     }
 
     await this.sessionService.delete({
@@ -181,7 +183,7 @@ export class AuthService {
 
   async changePassword(userId: string, data: ChangePasswordDto) {
     // Change password logic
-    const userCandidate = await this.userService.getExists({
+    const userCandidate = await this.userService.getExisting({
       where: {
         id: userId,
       },
