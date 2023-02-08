@@ -6,11 +6,12 @@ import {
 import Prisma from '@prisma/client';
 
 import { BaseExpenseCategoryService } from '@Module/expense/base-expense-category.service';
-import { prisma } from '@Src/shared/prisma';
+import { PrismaService } from '@Shared/modules/prisma/prisma.service';
 
 @Injectable()
 export class ExpenseCategoryService {
   constructor(
+    private readonly prismaService: PrismaService,
     private readonly baseExpenseCategoryService: BaseExpenseCategoryService,
   ) { }
 
@@ -32,23 +33,23 @@ export class ExpenseCategoryService {
   }
 
   async findFirst(data: Prisma.Prisma.ExpenseCategoryFindFirstArgs) {
-    return prisma.expenseCategory.findFirst(data);
+    return this.prismaService.expenseCategory.findFirst(data);
   }
 
   async findMany(data: Prisma.Prisma.ExpenseCategoryFindManyArgs) {
-    return prisma.expenseCategory.findMany(data);
+    return this.prismaService.expenseCategory.findMany(data);
   }
 
   async create(data: Prisma.Prisma.ExpenseCategoryCreateArgs) {
-    return prisma.expenseCategory.create(data);
+    return this.prismaService.expenseCategory.create(data);
   }
 
   async update(data: Prisma.Prisma.ExpenseCategoryUpdateArgs) {
-    return prisma.expenseCategory.update(data);
+    return this.prismaService.expenseCategory.update(data);
   }
 
   async delete(data: Prisma.Prisma.ExpenseCategoryDeleteArgs) {
-    return prisma.expenseCategory.delete(data);
+    return this.prismaService.expenseCategory.delete(data);
   }
 
   async generateBaseCategoriesForUser(userId: string) {
@@ -59,7 +60,8 @@ export class ExpenseCategoryService {
       userId,
     }));
 
-    await prisma.expenseCategory.createMany({
+    await this.prismaService.expenseCategory.createMany({
+
       data: labels,
       skipDuplicates: true,
     });

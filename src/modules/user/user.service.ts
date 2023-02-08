@@ -1,22 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import Prisma from '@prisma/client';
 
-import { prisma } from '@Src/shared/prisma';
+import { PrismaService } from '@Shared/modules/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor() { }
+  constructor(
+    private readonly prismaService: PrismaService,
+  ) { }
 
   async create(data: Prisma.Prisma.UserCreateArgs) {
-    return prisma.user.create(data);
+    return this.prismaService.user.create(data);
   }
 
   async findFirst(data: Prisma.Prisma.UserFindFirstArgs) {
-    return prisma.user.findFirst(data);
+    return this.prismaService.user.findFirst(data);
   }
 
   async findMany(data: Prisma.Prisma.UserFindManyArgs) {
-    return prisma.user.findMany(data);
+    return this.prismaService.user.findMany(data);
   }
 
   async getExisting(
@@ -37,6 +39,6 @@ export class UserService {
   }
 
   async update(data: Prisma.Prisma.UserUpdateArgs) {
-    return prisma.user.update(data);
+    return this.prismaService.user.update(data);
   }
 }

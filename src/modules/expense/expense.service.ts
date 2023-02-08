@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { prisma } from '@Src/shared/prisma';
 import {
   UpdateExpenseCategoryDto,
   CreateExpenseCategoryDto,
@@ -11,10 +10,12 @@ import { UserService } from '@Module/user/user.service';
 import { BaseExpenseCategoryService } from '@Module/expense/base-expense-category.service';
 import { TransactionService } from '@Module/expense/transaction.service';
 import { ExpenseCategoryService } from '@Module/expense/expense-category.service';
+import { PrismaService } from '@Shared/modules/prisma/prisma.service';
 
 @Injectable()
 export class ExpenseService {
   constructor(
+    private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly baseExpenseCategoryService: BaseExpenseCategoryService,
     private readonly expenseCategoryService: ExpenseCategoryService,
@@ -126,7 +127,7 @@ export class ExpenseService {
       },
     });
 
-    const checkCategoryExists = await prisma.expenseCategory.findFirst({
+    const checkCategoryExists = await this.prismaService.expenseCategory.findFirst({
       where: {
         userId,
         label: data.label,
@@ -139,7 +140,7 @@ export class ExpenseService {
       );
     }
 
-    return prisma.expenseCategory.create({
+    return this.prismaService.expenseCategory.create({
       data: {
         userId: userCandidate.id,
         label: data.label,
@@ -189,7 +190,7 @@ export class ExpenseService {
       categoryCandidate,
     );
 
-    return prisma.expenseCategory.update({
+    return this.prismaService.expenseCategory.update({
       where: {
         id: categoryCandidate.id,
       },
@@ -248,7 +249,7 @@ export class ExpenseService {
       categoryCandidate,
     );
 
-    await prisma.expenseCategory.delete({
+    await this.prismaService.expenseCategory.delete({
       where: {
         id: categoryCandidate.id,
       },

@@ -1,30 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import Prisma from '@prisma/client';
 
-import { prisma } from '@Src/shared/prisma';
+import { PrismaService } from '@Shared/modules/prisma/prisma.service';
+
 
 @Injectable()
 export class SessionService {
-  constructor() {}
+  constructor(
+    private readonly prismaService: PrismaService,
+  ) { }
 
   async create(data: Prisma.Prisma.SessionCreateArgs) {
-    return await prisma.session.create(data);
+    return this.prismaService.session.create(data);
   }
 
   async delete(data: Prisma.Prisma.SessionDeleteArgs) {
-    return await prisma.session.delete(data);
+    return this.prismaService.session.delete(data);
   }
 
   async deleteMany(data: Prisma.Prisma.SessionDeleteManyArgs) {
-    return await prisma.session.deleteMany(data);
+    return this.prismaService.session.deleteMany(data);
   }
 
   async findMany(data: Prisma.Prisma.SessionFindManyArgs) {
-    return await prisma.session.findMany(data);
+    return this.prismaService.session.findMany(data);
   }
 
   async findFirst(data: Prisma.Prisma.SessionFindFirstArgs) {
-    return await prisma.session.findFirst(data);
+    return this.prismaService.session.findFirst(data);
   }
 
   async getExisting(
@@ -64,6 +67,6 @@ export class SessionService {
   }
 
   async update(data: Prisma.Prisma.SessionUpdateArgs) {
-    return await prisma.session.update(data);
+    return this.prismaService.session.update(data);
   }
 }

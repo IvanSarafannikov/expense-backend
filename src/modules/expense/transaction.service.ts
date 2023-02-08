@@ -1,3 +1,4 @@
+import { PrismaService } from '@Shared/modules/prisma/prisma.service';
 import {
   BadRequestException,
   Injectable,
@@ -5,11 +6,11 @@ import {
 } from '@nestjs/common';
 import Prisma from '@prisma/client';
 
-import { prisma } from '@Src/shared/prisma';
-
 @Injectable()
 export class TransactionService {
-  constructor() {}
+  constructor(
+    private readonly prismaService: PrismaService,
+  ) { }
 
   async getExisting(
     data: Prisma.Prisma.TransactionFindFirstArgs,
@@ -29,27 +30,27 @@ export class TransactionService {
   }
 
   async findFirst(data: Prisma.Prisma.TransactionFindFirstArgs) {
-    return prisma.transaction.findFirst(data);
+    return this.prismaService.transaction.findFirst(data);
   }
 
   async findMany(data: Prisma.Prisma.TransactionFindManyArgs) {
-    return prisma.transaction.findMany(data);
+    return this.prismaService.transaction.findMany(data);
   }
 
   async create(data: Prisma.Prisma.TransactionCreateArgs) {
-    return prisma.transaction.create(data);
+    return this.prismaService.transaction.create(data);
   }
 
   async update(data: Prisma.Prisma.TransactionUpdateArgs) {
-    return prisma.transaction.update(data);
+    return this.prismaService.transaction.update(data);
   }
 
   async updateMany(data: Prisma.Prisma.TransactionUpdateManyArgs) {
-    return prisma.transaction.updateMany(data);
+    return this.prismaService.transaction.updateMany(data);
   }
 
   async delete(data: Prisma.Prisma.TransactionDeleteArgs) {
-    return prisma.transaction.delete(data);
+    return this.prismaService.transaction.delete(data);
   }
 
   checkIfTransactionBelongsToUser(
